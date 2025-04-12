@@ -9,7 +9,7 @@ st.set_page_config(layout="wide")
 st.title("Cartola FC Analytics")
 
 teams = get_cartola_fc_teams_data(season)
-players = get_cartola_fc_players_data(season)
+players = get_cartola_fc_players_data(season, teams)
 
 col1, col2 = st.columns(2)
 
