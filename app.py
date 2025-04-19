@@ -1,5 +1,6 @@
 import streamlit as st
 import altair as alt
+import pandas as pd
 
 from helpers.cartola_data import (
     format_cartola_matches_api_response,
@@ -29,7 +30,7 @@ with col2:
     st.header("Players")
     st.dataframe(players, use_container_width=True)
 
-if next_matches:
+if isinstance(next_matches, pd.DataFrame):
     st.header("Next Matches Analysis")
     st.dataframe(next_matches, use_container_width=True)
 

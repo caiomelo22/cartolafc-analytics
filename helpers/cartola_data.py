@@ -96,7 +96,7 @@ def create_player_scoring_columns(row, teams_df, next_matches_df):
     row["Total_Score"] = total_score
     row["Total_Score_Match"] = total_score / row["Matches_Played"]
 
-    if next_matches_df:
+    if isinstance(next_matches_df, pd.DataFrame):
         row["Next_Opponent"], row["Next_Opponent_Score_Match"] = (
             get_next_opponent_score_match(row["Team"], next_matches_df)
         )
