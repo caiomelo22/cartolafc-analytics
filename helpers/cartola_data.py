@@ -156,8 +156,6 @@ def format_cartola_matches_api_response(teams_df):
 
     matches_response = cartola_api.get_matches()
 
-    print("Matches response", matches_response)
-
     if matches_response.get("code") == "1":
         return None
 
