@@ -96,9 +96,10 @@ def create_player_scoring_columns(row, teams_df, next_matches_df):
     row["Total_Score"] = total_score
     row["Total_Score_Match"] = total_score / row["Matches_Played"]
 
-    row["Next_Opponent"], row["Next_Opponent_Score_Match"] = (
-        get_next_opponent_score_match(row["Team"], next_matches_df)
-    )
+    if next_matches_df:
+        row["Next_Opponent"], row["Next_Opponent_Score_Match"] = (
+            get_next_opponent_score_match(row["Team"], next_matches_df)
+        )
 
     return row
 
@@ -154,6 +155,11 @@ def format_cartola_matches_api_response(teams_df):
     cartola_api = CartolaFCAPI()
 
     matches_response = cartola_api.get_matches()
+
+    print("Matches response", matches_response)
+
+    if matches_response.get("code") == "1":
+        return None
 
     teams = matches_response["clubes"]
     matches = matches_response["partidas"]

@@ -29,28 +29,29 @@ with col2:
     st.header("Players")
     st.dataframe(players, use_container_width=True)
 
-st.header("Next Matches Analysis")
-st.dataframe(next_matches, use_container_width=True)
+if next_matches:
+    st.header("Next Matches Analysis")
+    st.dataframe(next_matches, use_container_width=True)
 
-st.subheader("Player Analysis")
-# st.scatter_chart(players[["Total_Score_Match", "Next_Opponent_Score_Match"]])
-chart = (
-    alt.Chart(players)
-    .mark_circle(size=60)
-    .encode(
-        x=alt.X("Total_Score_Match", axis=alt.Axis(title="Score/Match")),
-        y=alt.Y(
-            "Next_Opponent_Score_Match", axis=alt.Axis(title="Opponent Score/Match")
-        ),
-        tooltip=[
-            "Name",
-            "Team",
-            "Next_Opponent",
-            "Total_Score_Match",
-            "Next_Opponent_Score_Match",
-        ],
+    st.subheader("Player Analysis")
+    # st.scatter_chart(players[["Total_Score_Match", "Next_Opponent_Score_Match"]])
+    chart = (
+        alt.Chart(players)
+        .mark_circle(size=60)
+        .encode(
+            x=alt.X("Total_Score_Match", axis=alt.Axis(title="Score/Match")),
+            y=alt.Y(
+                "Next_Opponent_Score_Match", axis=alt.Axis(title="Opponent Score/Match")
+            ),
+            tooltip=[
+                "Name",
+                "Team",
+                "Next_Opponent",
+                "Total_Score_Match",
+                "Next_Opponent_Score_Match",
+            ],
+        )
+        .interactive()
     )
-    .interactive()
-)
 
-st.altair_chart(chart, use_container_width=True)
+    st.altair_chart(chart, use_container_width=True)
