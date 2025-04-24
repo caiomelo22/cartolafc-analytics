@@ -1,5 +1,7 @@
+import math
 import pandas as pd
 from thefuzz import process
+from sklearn.preprocessing import MinMaxScaler
 
 from services.mysql import get_data
 from services.cartola_api import CartolaFCAPI
@@ -118,8 +120,10 @@ def get_cartola_fc_teams_data(season):
     return teams.sort_values(by="Total_Score_Match", ascending=False)
 
 
-def get_cartola_fc_players_data(season, teams_df, next_matches_df):
+def get_cartola_fc_players_data(season, teams_df: pd.DataFrame, next_matches_df):
     where_clause = get_season_where_clause(season)
+
+    total_matches_played = teams_df["Matches_Played"].median()
 
     players_columns = ["Name", "Position"]
 
@@ -138,7 +142,24 @@ def get_cartola_fc_players_data(season, teams_df, next_matches_df):
 
     players.fillna(0, inplace=True)
 
-    return players.sort_values(by="Total_Score_Match", ascending=False)
+    players = players[
+        players["Matches_Played"] > math.floor(0.4 * total_matches_played)
+    ]
+
+    scaler = MinMaxScaler()
+
+    players[["Total_Score_Match_Norm", "Next_Opponent_Score_Match_Norm"]] = (
+        scaler.fit_transform(
+            players[["Total_Score_Match", "Next_Opponent_Score_Match"]]
+        )
+    )
+
+    # Score final: prioriza jogador bom vs adversário fraco
+    players["Norm_Score_Match"] = (
+        players["Total_Score_Match_Norm"] - players["Next_Opponent_Score_Match_Norm"]
+    )
+
+    return players.sort_values(by="Norm_Score_Match", ascending=False)
 
 
 def find_best_match(teams_df, search_team, score_cutoff=70):
