@@ -88,4 +88,5 @@ if isinstance(next_matches, pd.DataFrame):
         "Norm_Score_Match",
     ]
 
+    st.markdown("Top Players by Position")
     st.dataframe(players_filtered[filtered_player_columns], use_container_width=True)
