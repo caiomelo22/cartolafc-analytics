@@ -120,7 +120,9 @@ def get_cartola_fc_teams_data(season):
     return teams.sort_values(by="Total_Score_Match", ascending=False)
 
 
-def get_cartola_fc_players_data(season, teams_df: pd.DataFrame, next_matches_df):
+def get_cartola_fc_players_data(
+    season, teams_df: pd.DataFrame, next_matches_df
+) -> pd.DataFrame:
     where_clause = get_season_where_clause(season)
 
     total_matches_played = teams_df["Matches_Played"].median()

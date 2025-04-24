@@ -14,30 +14,51 @@ st.set_page_config(layout="wide")
 
 st.title("Cartola FC Analytics")
 
-teams = get_cartola_fc_teams_data(season)
+# Fetch and cache data only once using session state
+if "teams" not in st.session_state:
+    st.session_state.teams = get_cartola_fc_teams_data(season)
 
-next_matches = format_cartola_matches_api_response(teams)
+if "next_matches" not in st.session_state:
+    st.session_state.next_matches = format_cartola_matches_api_response(
+        st.session_state.teams
+    )
 
-players = get_cartola_fc_players_data(season, teams, next_matches)
+if "players" not in st.session_state:
+    st.session_state.players = get_cartola_fc_players_data(
+        season,
+        st.session_state.teams,
+        st.session_state.next_matches,
+    )
 
-col1, col2 = st.columns(2)
+# Use session state variables
+teams = st.session_state.teams
+next_matches = st.session_state.next_matches
+players = st.session_state.players
 
-with col1:
-    st.header("Teams")
-    st.dataframe(teams, use_container_width=True)
-
-with col2:
-    st.header("Players")
-    st.dataframe(players, use_container_width=True)
+st.header("Teams")
+st.dataframe(teams, use_container_width=True)
 
 if isinstance(next_matches, pd.DataFrame):
     st.header("Next Matches Analysis")
     st.dataframe(next_matches, use_container_width=True)
 
     st.subheader("Player Analysis")
-    # st.scatter_chart(players[["Total_Score_Match", "Next_Opponent_Score_Match"]])
+
+    position_options = ["DF", "MF", "FW"]
+
+    selected_position = st.radio(
+        "Select the position:", position_options, horizontal=True
+    )
+
+    if selected_position:
+        players_filtered = players[
+            players["Position"] == selected_position
+        ].reset_index(drop=True)
+    else:
+        players_filtered = players.copy().reset_index(drop=True)
+
     chart = (
-        alt.Chart(players)
+        alt.Chart(players_filtered)
         .mark_circle(size=60)
         .encode(
             x=alt.X("Total_Score_Match", axis=alt.Axis(title="Score/Match")),
@@ -56,3 +77,15 @@ if isinstance(next_matches, pd.DataFrame):
     )
 
     st.altair_chart(chart, use_container_width=True)
+
+    filtered_player_columns = [
+        "Name",
+        "Team",
+        "Next_Opponent",
+        "Matches_Played",
+        "Next_Opponent_Score_Match",
+        "Total_Score_Match",
+        "Norm_Score_Match",
+    ]
+
+    st.dataframe(players_filtered[filtered_player_columns], use_container_width=True)
